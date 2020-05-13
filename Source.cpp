@@ -10,19 +10,24 @@
 int main() {
 
 	int width, height, channelCount;
-	unsigned char* image = stbi_load("1280x720.jpg", &width, &height, &channelCount, 3);
+	unsigned char* image = stbi_load("KEKW.png", &width, &height, &channelCount, STBI_rgb_alpha);
+	if (image == NULL) {
+		std::cout << "HUSTON WE'VE GOT A PROBLEM (FAILED TO LOAD IMAGE) " << std::endl;
+		exit(1);
+	}
 
 	int success = stbir_resize_uint8(image, width, height, 0, image, width, height, 0, channelCount);
 
-	//std::cout << "Image successfully loaded! " << success << std::endl;
+	std::cout << "Image successfully loaded! " << success << std::endl;
 	
 	unsigned char* image_pixels = new unsigned char[width * height];
 	
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
-	
-	std::string ASCII = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"; // Length 66 but skip 2 and 24
+	unsigned char a;
+
+	std::string ASCII = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"; // Length 66 but skip 2 and 24, so 64
 	
 
 	for (size_t i = 0; i < height * width; i++) {
@@ -30,8 +35,14 @@ int main() {
 		r = pixelOffset[0];
 		g = pixelOffset[1];
 		b = pixelOffset[2];
-		// Ignore Alpha for calculations
-		float magicNum = floor((((static_cast<int>(r) + static_cast<int>(g) + static_cast<int>(b)) / 3.0f) / 255.0) * 65.0);
+	
+		float magicNum = floor(((((int)r + (int)g + (int)b) / (float)channelCount) / 255.0) * 64.0);
+	
+		if (channelCount == 4) {
+			a = pixelOffset[3];
+			float magicNum = floor(((((int)r + (int)g + (int)b + (int)a) / (float)channelCount) / 255.0) * 64.0);
+		}
+		
 	
 		char c = ASCII.at(magicNum);
 
@@ -49,4 +60,4 @@ int main() {
 	return 0;
 }
 
-//TODO: Convert to RGBA (https://github.com/xeekworx/image/blob/master/image.cpp)
+//(https://github.com/xeekworx/image/blob/master/image.cpp)
